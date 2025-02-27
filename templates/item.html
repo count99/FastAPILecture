@@ -1,0 +1,49 @@
+<html lang="zh-tw">
+<head>
+    <title>Item Details</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <h1><a href="{{ url_for('read_item', id=id) }}">Item ID: {{ id }}</a></h1>
+    <h6>前端js實現</h6>
+    <button id="addButton1" onclick="incrementAndRedirect()">Add Button1</button>
+    <h6>後端渲染</h6>
+    <button id="addButton2" onclick="window.location.href='{{ url_for('add_item1', id=id) }}'">AddButton2</button>
+    <h6>後端渲染後前端js</h6>
+    <button id="addButton3" onclick="add3()">AddButton3</button>
+</body>
+<script>
+    function add3() {
+        var currentId = {{ id }};
+        // 發送 POST 到當前 id 的路由
+        fetch('/items/' + currentId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.open();
+            document.write(html);
+            document.close();
+            // 更新 URL 為新 id（currentId + 1）
+            var newId = currentId + 1;
+            history.pushState({}, '', '/items/' + newId);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            window.location.reload();
+        });
+    } // 這裡是函數的正確結尾
+
+    function incrementAndRedirect() {
+        var currentPath = window.location.pathname;
+        console.log(currentPath);
+        var currentId = parseInt(currentPath.split('/').pop());
+        console.log(currentId);
+        var newId = currentId + 1;
+        window.location.href = "/items/" + newId;
+    }
+</script>
+</html>
